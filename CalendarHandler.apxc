@@ -1,0 +1,78 @@
+public class CalendarHandler{
+    public Date selectedDate;
+    public Hour_Log__c hourLog;
+    public Boolean showForm;
+                          
+    public list<SelectOption> getSundays () {
+        //gets sundays in 2022
+        Date firstDate = date.newInstance(2022, 1, 2); //the first known Sunday
+        list<SelectOption> result = new list<selectOption>();
+        while (firstDate.year()== 2022) {
+            //add to result list and add 7 days
+            result.add(new SelectOption (firstDate.format(), firstDate.format()));
+            firstDate = firstDate.addDays(7);
+        }
+        return result;
+    }
+    
+    public void setSelectedDate(Date selectedDate) {
+        this.selectedDate = selectedDate;
+    }
+    
+    public Date getSelectedDate() {
+        if (selectedDate == null) {
+        	return Date.newInstance(2022, 1, 2);
+        } 
+        else {
+            return selectedDate;
+        }
+    }
+    
+    public Boolean getShowForm() {
+        return showForm;
+    }
+
+    public void setHourLog(Hour_Log__c hourLog) {
+        this.hourLog = hourLog;
+    }
+    
+    public Hour_Log__c getHourLog() {
+        return hourLog;
+    }
+    
+    public void updtHourLog() {
+        //fetches the record for the current week and user, or instantiates a new record
+        Id currentUser = UserInfo.getUserId();
+        List<Hour_Log__c> resLst = [select Id,Sunday_Hours__c,Monday_Hours__c,Tuesday_Hours__c,Wednesday_Hours__c,Thursday_Hours__c,Friday_Hours__c,Saturday_Hours__c
+                                    from Hour_Log__c where Date__c = :selectedDate and Employee__c = :currentUser];
+        if (resLst.size() == 0) {
+            Hour_Log__c newLog = new Hour_Log__c(Date__c = selectedDate,
+                                                Employee__c = currentUser,
+                                                Monday_Hours__c=0,
+                                                Tuesday_Hours__c=0,
+                                                Wednesday_Hours__c=0,
+                                                Thursday_Hours__c=0,
+                                                Friday_Hours__c=0,
+                                                Saturday_Hours__c=0,
+                                                Sunday_Hours__c=0);
+            this.hourLog = newLog;
+            this.showForm=True; //allow the user to input hours
+        }
+        else {
+        	this.hourLog = resLst[0];
+            this.showForm=True; //allow the user to input hours
+        }
+    }    
+
+    public void save() {
+        //updates total hours
+        hourLog.Number_of_Hours__c = hourLog.Monday_Hours__c+
+            hourLog.Tuesday_Hours__c+
+            hourLog.Wednesday_Hours__c+
+            hourLog.Thursday_Hours__c +
+            hourLog.Friday_Hours__c +
+            hourLog.Saturday_Hours__c +
+            hourLog.Sunday_Hours__c;
+        	upsert hourLog; //upsert so each user/week combination has a unique timesheet entry
+	}
+}
