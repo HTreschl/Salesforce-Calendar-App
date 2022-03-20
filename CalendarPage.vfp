@@ -1,0 +1,43 @@
+<apex:page controller="CalendarHandler" standardStylesheets="true" docType="html-5.0">
+    <head>Timeclock</head>
+    <body>
+        <apex:messages />
+        <apex:form >
+            <apex:pageBlock title="Select the week for which to enter hours">
+            <p>Selected day indicates the first day of the week</p>
+                <apex:selectList value="{!selectedDate}" multiselect="False" size="1">
+                    <apex:selectOptions value="{!Sundays}"/>
+                </apex:selectList>
+                <apex:commandButton value="Fetch Records" action="{!updtHourLog}"/>
+            </apex:pageBlock>
+        </apex:form>
+        <apex:form rendered="{!showForm}">
+            <apex:pageBlock title="Enter the hours worked for each day">
+                <apex:pageBlockTable value="{!hourLog}" var="log" columnsWidth="20%">
+                    <apex:column headerValue="Sunday Hours">
+                        <apex:inputField value="{!log.Sunday_Hours__c}" style="width:50%"/>
+                    </apex:column>
+                    <apex:column headerValue="Monday Hours">
+                        <apex:inputField value="{!log.Monday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                    <apex:column headerValue="Tuesday Hours">
+                        <apex:inputField value="{!log.Tuesday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                    <apex:column headerValue="Wednesday Hours">
+                        <apex:inputField value="{!log.Wednesday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                    <apex:column headerValue="Thursday Hours">
+                        <apex:inputField value="{!log.Thursday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                    <apex:column headerValue="Friday Hours">
+                        <apex:inputField value="{!log.Friday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                    <apex:column headerValue="Saturday Hours">
+                        <apex:inputField value="{!log.Saturday_Hours__c}" style="width:50%" />
+                    </apex:column>
+                </apex:pageBlockTable>
+                <apex:commandButton action="{!save}" value="Save"/>
+            </apex:pageBlock>
+        </apex:form>
+    </body>
+</apex:page>
